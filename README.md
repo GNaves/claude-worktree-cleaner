@@ -63,11 +63,31 @@ em `~/.claude/projects/`.
 ## Linux: ícone na bandeja
 
 No GNOME o ícone precisa da extensão "AppIndicator and KStatusNotifierItem Support".
-KDE, XFCE, Cinnamon e MATE funcionam direto. No Linux o clique abre o menu/janela centralizada
-(não há posição do ícone como no macOS).
+KDE, XFCE, Cinnamon e MATE funcionam direto. No Linux o ícone (AppIndicator) só oferece menu:
+use **Abrir** nele para ver a janela, que abre centralizada (não há posição do ícone como no macOS).
 
 ## Limitações conhecidas
 
 - Não detecta processos com a worktree aberta (ex.: um terminal parado nela); a heurística é a
   última atividade. Se quiser, dá para adicionar um `lsof +D` opcional.
-- Ícone da bandeja é desenhado em código; troque por um PNG/Template em `trayIcon()` se quiser.
+- O instalador compila no seu computador (precisa de Node 20+ e git) e o app não é assinado nem
+  notarizado pela Apple. Ainda não há release pronto para baixar.
+- O caminho do macOS foi escrito seguindo o do Linux, que é o testado de ponta a ponta; se algo
+  falhar no Mac, abra uma issue com a saída do terminal.
+
+## Ícones
+
+O desenho (branch do git com um brilho de "limpeza") é gerado por `tools/make-icons.py` (Pillow):
+`src/assets/iconTemplate*.png` (macOS, template preto que se adapta ao tema), `src/assets/icon.png`
+(Linux, laranja) e `build/icon.png` (ícone do app). Para mudar cor/traço, edite o script e rode
+`python3 tools/make-icons.py`.
+
+## Estrutura
+
+| Arquivo | O que é |
+|---|---|
+| `install.sh` | instala/atualiza/remove o app residente (macOS e Linux) |
+| `src/core.js` | descobre, classifica e remove worktrees (sem dependências) |
+| `src/main.js` | tray/barra de menu, janela, início automático, IPC |
+| `src/renderer/` | interface da janela |
+| `test/core.test.js` | teste da lógica com repositório git temporário |
