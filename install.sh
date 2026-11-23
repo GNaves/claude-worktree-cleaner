@@ -18,8 +18,11 @@ OS="$(uname)"
 mac_dest() { if [ -w /Applications ]; then echo /Applications; else mkdir -p "$HOME/Applications"; echo "$HOME/Applications"; fi; }
 
 stop_app() {
+  # encerra o app instalado e também instâncias de desenvolvimento (`npm start`), que
+  # ficam com o ícone antigo na barra e seguram a instância única
   if [ "$OS" = Darwin ]; then pkill -x "$APP_NAME" 2>/dev/null || true
   else pkill -f "$HOME/.local/share/$BIN_NAME/$BIN_NAME" 2>/dev/null || true; fi
+  pkill -f "$BIN_NAME/node_modules/electron" 2>/dev/null || true
   sleep 1
 }
 
