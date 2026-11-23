@@ -55,9 +55,13 @@ if ! command -v git >/dev/null 2>&1 || ! git --version >/dev/null 2>&1; then
 fi
 
 # ---------- código-fonte ----------
-here="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
+# Só usa uma cópia local se o script for um ARQUIVO (./install.sh). Via `curl | bash` não há
+# arquivo, e a pasta atual não pode ser tratada como código-fonte (pode ser uma cópia velha).
+script="${BASH_SOURCE[0]:-}"
+here=""
+if [ -n "$script" ] && [ -f "$script" ]; then here="$(cd "$(dirname "$script")" && pwd)"; fi
 if [ -n "$here" ] && [ -f "$here/package.json" ] && grep -q '"name": "claude-worktree-cleaner"' "$here/package.json"; then
-  root="$here"            # rodando de dentro de um clone
+  root="$here"            # rodando ./install.sh de dentro de um clone
 else
   if [ -d "$SRC_DIR/.git" ]; then
     echo "→ Atualizando o código em $SRC_DIR…"
