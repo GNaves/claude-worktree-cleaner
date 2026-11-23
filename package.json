@@ -1,0 +1,23 @@
+{
+  "name": "claude-worktree-cleaner",
+  "version": "0.1.0",
+  "description": "App de barra de menu/tray (Mac e Linux) para listar e limpar worktrees do Claude Code que não estão mais em uso",
+  "main": "src/main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/core.test.js",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "dev.local.claude-worktree-cleaner",
+    "productName": "Claude Worktree Cleaner",
+    "files": ["src/**/*", "package.json"],
+    "mac": { "category": "public.app-category.developer-tools", "target": ["dmg"], "extendInfo": { "LSUIElement": true } },
+    "linux": { "category": "Development", "target": ["AppImage", "deb"] }
+  }
+}

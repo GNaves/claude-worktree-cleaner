@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'">
+<title>Claude Worktree Cleaner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Worktrees do Claude</h1>
+    <div class="actions">
+      <label>inativas após <input id="days" type="number" min="0" max="365" value="7"> dias</label>
+      <button id="refresh" title="Atualizar">Atualizar</button>
+      <button id="addroot" title="Varrer outra pasta">+ Pasta</button>
+    </div>
+  </header>
+
+  <div id="summary"></div>
+
+  <main>
+    <table>
+      <thead>
+        <tr><th><input type="checkbox" id="all"></th><th>Worktree</th><th>Repositório</th><th>Atividade</th><th>Tamanho</th><th>Estado</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="empty" hidden>Nenhuma worktree do Claude encontrada.</p>
+  </main>
+
+  <footer>
+    <label><input type="checkbox" id="delbranch" checked> apagar a branch junto</label>
+    <label class="danger"><input type="checkbox" id="force"> forçar (perde alterações)</label>
+    <span class="spacer"></span>
+    <button id="selstale">Selecionar inativas</button>
+    <button id="clean" class="primary" disabled>Remover selecionadas</button>
+  </footer>
+  <div id="log"></div>
+  <script src="renderer.js"></script>
+</body>
+</html>

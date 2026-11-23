@@ -1,0 +1,27 @@
+:root { color-scheme: light dark; --bg:#fff; --fg:#1d1d1f; --mut:#6e6e73; --line:#e5e5ea; --acc:#2f6fed; --bad:#d93025; --ok:#1e8e3e; --warn:#b06000; }
+@media (prefers-color-scheme: dark) { :root { --bg:#1e1e20; --fg:#f2f2f7; --mut:#98989d; --line:#38383a; --acc:#6b9bff; --bad:#ff6b60; --ok:#5dd27a; --warn:#f0b050; } }
+* { box-sizing: border-box; }
+body { margin:0; font:13px -apple-system, system-ui, "Segoe UI", sans-serif; background:var(--bg); color:var(--fg); display:flex; flex-direction:column; height:100vh; }
+header { display:flex; justify-content:space-between; align-items:center; padding:12px 14px 8px; -webkit-app-region:drag; }
+header .actions, footer { -webkit-app-region:no-drag; }
+h1 { font-size:15px; margin:0; }
+.actions { display:flex; gap:8px; align-items:center; }
+input[type=number] { width:48px; }
+button { font:inherit; padding:4px 10px; border:1px solid var(--line); background:transparent; color:var(--fg); border-radius:6px; cursor:pointer; }
+button:hover:not(:disabled) { border-color:var(--acc); }
+button:disabled { opacity:.45; cursor:default; }
+button.primary { background:var(--acc); border-color:var(--acc); color:#fff; }
+#summary { padding:0 14px 8px; color:var(--mut); }
+main { flex:1; overflow:auto; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+table { width:100%; border-collapse:collapse; }
+th { position:sticky; top:0; background:var(--bg); text-align:left; font-weight:600; color:var(--mut); padding:6px 8px; border-bottom:1px solid var(--line); }
+td { padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+td small { display:block; color:var(--mut); }
+.badge { display:inline-block; padding:1px 7px; border-radius:10px; font-size:11px; border:1px solid currentColor; }
+.stale { color:var(--ok); } .active { color:var(--mut); } .blocked { color:var(--warn); }
+tr.blocked td:nth-child(2) { opacity:.9; }
+footer { display:flex; align-items:center; gap:12px; padding:10px 14px; }
+footer .spacer { flex:1; }
+.danger { color:var(--bad); }
+#log { padding:0 14px 10px; color:var(--mut); font-size:12px; white-space:pre-wrap; max-height:80px; overflow:auto; }
+#empty { padding:20px; color:var(--mut); text-align:center; }
