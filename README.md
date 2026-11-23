@@ -10,7 +10,12 @@ npm install
 npm start
 ```
 
-Gerar instalador: `npm run dist` (.dmg no Mac; AppImage e .deb no Linux).
+Na primeira execução o Electron baixa o binário (~100 MB); isso é normal.
+
+Gerar instalador: `npm run dist` (.dmg no Mac; AppImage e .deb no Linux). O build do Mac sai
+**sem assinatura** (`identity: null`), então o Gatekeeper pode reclamar ao abrir o .app: clique
+com o botão direito > Abrir, ou rode `xattr -cr "dist/mac-arm64/Claude Worktree Cleaner.app"`.
+Para assinar com seu certificado, remova `"identity": null` do `package.json`.
 Testar a lógica: `npm test` (usa um repositório git temporário, não toca nos seus).
 
 ## Como decide o que está "em uso"
