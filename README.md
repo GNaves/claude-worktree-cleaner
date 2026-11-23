@@ -91,3 +91,9 @@ O desenho (branch do git com um brilho de "limpeza") é gerado por `tools/make-i
 | `src/main.js` | tray/barra de menu, janela, início automático, IPC |
 | `src/renderer/` | interface da janela |
 | `test/core.test.js` | teste da lógica com repositório git temporário |
+
+## Contribuir
+
+Contribuições são bem-vindas: faça um fork, crie uma branch e abra um Pull Request. Só o dono
+(@GNaves) revisa e faz o merge na `main`; push direto, force-push e apagar a `main` não são
+permitidos para ninguém além dele. Rode `npm test` antes de abrir o PR.
