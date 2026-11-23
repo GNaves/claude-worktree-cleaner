@@ -8,7 +8,8 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test test/core.test.js",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "install-app": "bash install.sh"
   },
   "devDependencies": {
     "electron": "^45.4.1",
@@ -17,13 +18,28 @@
   "build": {
     "appId": "dev.local.claude-worktree-cleaner",
     "productName": "Claude Worktree Cleaner",
-    "files": ["src/**/*", "package.json"],
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
     "mac": {
       "category": "public.app-category.developer-tools",
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "identity": null,
-      "extendInfo": { "LSUIElement": true }
+      "extendInfo": {
+        "LSUIElement": true
+      }
     },
-    "linux": { "category": "Development", "target": ["AppImage", "deb"], "maintainer": "GNaves" }
+    "linux": {
+      "category": "Development",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "maintainer": "GNaves",
+      "executableName": "claude-worktree-cleaner"
+    }
   }
 }

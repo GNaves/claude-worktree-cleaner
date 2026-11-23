@@ -3,20 +3,40 @@
 App de barra de menu (macOS) / bandeja (Linux) que lista as worktrees criadas pelo Claude Code
 (`<repo>/.claude/worktrees/*`) e remove as que não estão mais em uso.
 
-## Rodar
+## Instalar (fica rodando na barra, sem terminal)
+
+Precisa de Node 20+ e git (macOS: `brew install node git`). Cole no Terminal:
 
 ```bash
-npm install
-npm start
+curl -fsSL https://raw.githubusercontent.com/GNaves/claude-worktree-cleaner/main/install.sh | bash
+```
+
+O instalador baixa o código, compila o app com as versões travadas no `package-lock.json`, instala
+em `/Applications` (macOS, ou `~/Applications` se não for gravável) ou em `~/.local/share` (Linux)
+e abre. O ícone aparece na barra de menus / bandeja.
+
+- **Clique** no ícone abre a janela; **botão direito** (macOS) abre o menu com Atualizar, Iniciar com o sistema e Sair.
+- **Inicia sozinho no login**: na primeira execução ele se registra para abrir com o sistema.
+  Para desligar, desmarque "iniciar com o sistema" na janela ou no menu.
+- **Atualizar**: rode o mesmo comando de novo. A configuração é mantida.
+- **Remover**: `curl -fsSL https://raw.githubusercontent.com/GNaves/claude-worktree-cleaner/main/install.sh | bash -s -- --uninstall`
+
+O build local não é assinado nem notarizado pela Apple; o instalador remove a quarentena do `.app`
+para o macOS abrir sem reclamar. No Linux o atalho usa `--no-sandbox` (o `chrome-sandbox` de um
+build local não é SUID-root), e o app só carrega arquivos locais com CSP restrita.
+
+## Desenvolver
+
+```bash
+npm ci
+npm start      # roda em primeiro plano (fecha com o terminal; não registra início automático)
+npm test       # testa a lógica com um repositório git temporário
 ```
 
 Na primeira execução o Electron baixa o binário (~100 MB); isso é normal.
-
-Gerar instalador: `npm run dist` (.dmg no Mac; AppImage e .deb no Linux). O build do Mac sai
-**sem assinatura** (`identity: null`), então o Gatekeeper pode reclamar ao abrir o .app: clique
-com o botão direito > Abrir, ou rode `xattr -cr "dist/mac-arm64/Claude Worktree Cleaner.app"`.
-Para assinar com seu certificado, remova `"identity": null` do `package.json`.
-Testar a lógica: `npm test` (usa um repositório git temporário, não toca nos seus).
+Gerar .dmg / AppImage / .deb: `npm run dist`. O build do Mac sai **sem assinatura**
+(`identity: null`): se o Gatekeeper reclamar, botão direito > Abrir, ou
+`xattr -cr "dist/mac-arm64/Claude Worktree Cleaner.app"`.
 
 ## Como decide o que está "em uso"
 

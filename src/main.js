@@ -1,6 +1,7 @@
 'use strict';
 const { app, BrowserWindow, Tray, Menu, ipcMain, nativeImage, dialog, Notification } = require('electron');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const core = require('./core');
 
@@ -71,18 +72,55 @@ function toggleWindow() {
   if (win && win.isVisible()) win.hide(); else showWindow();
 }
 
+// ---------- iniciar com o sistema ----------
+// Só vale para o app instalado (empacotado); em `npm start` não registra o binário do Electron.
+const autostartFile = () => path.join(os.homedir(), '.config', 'autostart', 'claude-worktree-cleaner.desktop');
+
+function getAutostart() {
+  if (process.platform === 'darwin') return app.getLoginItemSettings().openAtLogin;
+  return fs.existsSync(autostartFile());
+}
+
+function setAutostart(on) {
+  if (!app.isPackaged) return getAutostart();
+  if (process.platform === 'darwin') {
+    app.setLoginItemSettings({ openAtLogin: !!on });
+  } else if (on) {
+    const exe = process.env.APPIMAGE || process.execPath;
+    fs.mkdirSync(path.dirname(autostartFile()), { recursive: true });
+    fs.writeFileSync(autostartFile(), [
+      '[Desktop Entry]', 'Type=Application', 'Name=Claude Worktree Cleaner',
+      `Exec="${exe}" --no-sandbox`, 'Terminal=false', 'X-GNOME-Autostart-enabled=true', '',
+    ].join('\n'));
+  } else {
+    fs.rmSync(autostartFile(), { force: true });
+  }
+  return getAutostart();
+}
+
+function quitApp() { app.isQuitting = true; app.quit(); }
+
 // ---------- tray ----------
+function buildMenu() {
+  const cleanable = lastScan.filter((i) => i.status === 'stale').length;
+  return Menu.buildFromTemplate([
+    { label: `Abrir (${cleanable} para limpar)`, click: showWindow },
+    { label: 'Atualizar', click: () => doScan() },
+    { type: 'separator' },
+    { label: 'Iniciar com o sistema', type: 'checkbox', checked: getAutostart(), enabled: app.isPackaged, click: (m) => setAutostart(m.checked) },
+    { label: 'Sair', click: quitApp },
+  ]);
+}
+
 function updateTray() {
   if (!tray) return;
   const cleanable = lastScan.filter((i) => i.status === 'stale').length;
   tray.setToolTip(`Claude Worktrees: ${lastScan.length} no total, ${cleanable} para limpar`);
   if (process.platform === 'darwin') tray.setTitle(cleanable ? ` ${cleanable}` : '');
-  tray.setContextMenu(Menu.buildFromTemplate([
-    { label: `Abrir (${cleanable} para limpar)`, click: showWindow },
-    { label: 'Atualizar', click: () => doScan() },
-    { type: 'separator' },
-    { label: 'Sair', click: () => { app.isQuitting = true; app.quit(); } },
-  ]));
+  // macOS: clique abre a janela e o menu fica no botão direito (setContextMenu faria o
+  // clique normal abrir o menu e o evento 'click' nunca dispararia). Linux (AppIndicator)
+  // só suporta menu, então ele continua via setContextMenu.
+  if (process.platform !== 'darwin') tray.setContextMenu(buildMenu());
 }
 
 async function doScan() {
@@ -111,6 +149,10 @@ ipcMain.handle('add-root', async () => {
   await doScan();
   return c;
 });
+
+ipcMain.handle('get-autostart', () => ({ on: getAutostart(), available: app.isPackaged }));
+ipcMain.handle('set-autostart', (_e, on) => setAutostart(!!on));
+ipcMain.handle('quit', () => quitApp());
 
 ipcMain.handle('remove', async (_e, { paths, force, deleteBranch }) => {
   // Revalida no main: usa os dados do último scan, nunca o que veio do renderer.
@@ -142,8 +184,12 @@ else {
     if (process.platform === 'darwin') app.dock.hide();
     tray = new Tray(trayIcon());
     tray.on('click', toggleWindow);
+    tray.on('right-click', () => tray.popUpContextMenu(buildMenu()));
     createWindow();
     updateTray();
+    // Primeira execução do app instalado: já deixa ligado para sobreviver a reinícios.
+    const cfg = loadCfg();
+    if (app.isPackaged && !cfg.autostartAsked) { setAutostart(true); saveCfg({ ...cfg, autostartAsked: true }); }
     await doScan();
     setInterval(doScan, 30 * 60 * 1000); // reescaneia a cada 30 min
   });

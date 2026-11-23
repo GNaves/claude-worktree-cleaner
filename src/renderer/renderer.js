@@ -81,9 +81,15 @@ $('clean').addEventListener('click', async () => {
   $('log').textContent = res.map((r) => `${r.removed ? '✔' : '✘'} ${r.path.split('/').pop()}: ${r.message}`).join('\n');
 });
 
+$('quit').addEventListener('click', () => window.api.quit());
+$('autostart').addEventListener('change', async () => { $('autostart').checked = await window.api.setAutostart($('autostart').checked); });
+
 window.api.onScan(setItems);
 (async () => {
   const cfg = await window.api.getConfig();
   $('days').value = cfg.staleDays;
+  const as = await window.api.getAutostart();
+  $('autostart').checked = as.on;
+  if (!as.available) { $('autostart').disabled = true; $('autostart-label').title = 'Disponível só no app instalado (veja o README)'; }
   refresh();
 })();
