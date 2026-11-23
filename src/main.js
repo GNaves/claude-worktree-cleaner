@@ -19,17 +19,17 @@ function saveCfg(c) {
   fs.writeFileSync(cfgFile(), JSON.stringify(c, null, 2));
 }
 
-// ---------- ícone (template 16x16 desenhado em código, sem arquivo) ----------
+// ---------- ícone ----------
+// macOS: iconTemplate.png (+@2x) é "template" (preto + alpha) e o sistema adapta ao tema.
+// Linux: icon.png colorido (laranja), legível em painel claro e escuro.
 function trayIcon() {
-  // quadrado vazado simples; "template" faz o macOS adaptar ao tema claro/escuro
-  const size = 16;
-  const buf = Buffer.alloc(size * size * 4, 0);
-  const px = (x, y) => { const i = (y * size + x) * 4; buf[i] = 0; buf[i + 1] = 0; buf[i + 2] = 0; buf[i + 3] = 255; };
-  for (let i = 2; i < 14; i++) { px(i, 2); px(i, 13); px(2, i); px(13, i); }
-  for (let i = 5; i < 11; i++) px(i, 7); // traço do meio (vira um "tronco")
-  const img = nativeImage.createFromBitmap(buf, { width: size, height: size });
-  if (process.platform === 'darwin') img.setTemplateImage(true);
-  return img;
+  const dir = path.join(__dirname, 'assets');
+  if (process.platform === 'darwin') {
+    const img = nativeImage.createFromPath(path.join(dir, 'iconTemplate.png'));
+    img.setTemplateImage(true);
+    return img;
+  }
+  return nativeImage.createFromPath(path.join(dir, 'icon.png')).resize({ width: 22, height: 22 });
 }
 
 // ---------- janela ----------
